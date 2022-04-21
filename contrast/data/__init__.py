@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.utils.data.distributed import DistributedSampler
 
 from .transform import get_transform
-from .dataset import ImageFolder
+from .dataset import ImageFolder, CityScapesFolder
 
 
 def get_loader(aug_type, args, two_crop=False, prefix='train', return_coord=False):
@@ -31,11 +31,18 @@ def get_loader(aug_type, args, two_crop=False, prefix='train', return_coord=Fals
             return_coord=return_coord)
     else:
         train_folder = os.path.join(args.data_dir, prefix)
+        train_dataset = CityScapesFolder(
+            train_folder,
+            transform=transform,
+            two_crop=two_crop,
+            return_coord=return_coord)
+        '''
         train_dataset = ImageFolder(
             train_folder,
             transform=transform,
             two_crop=two_crop,
             return_coord=return_coord)
+        '''
 
     # sampler
     indices = np.arange(dist.get_rank(), len(train_dataset), dist.get_world_size())
