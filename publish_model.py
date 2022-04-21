@@ -16,3 +16,4 @@ if __name__ == '__main__':
     md5sum = subprocess.check_output(['md5sum', out_file]).decode()
     out_file_with_md5sum = out_file.split('.')[0] + f'_md5_{md5sum[:8]}.pth'
     subprocess.Popen(['mv', out_file, out_file_with_md5sum])
+    
