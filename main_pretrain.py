@@ -193,16 +193,17 @@ def train(epoch, train_loader, model, optimizer, scheduler, args, summary_writer
 if __name__ == '__main__':
     opt = parse_option(stage='pre-train')
 
-    if opt.amp_opt_level != "O0":
-        assert amp is not None, "amp not installed!"
+    #if opt.amp_opt_level != "O0":
+    #    assert amp is not None, "amp not installed!"
 
-    torch.cuda.set_device(opt.local_rank)
-    torch.distributed.init_process_group(backend='nccl', init_method='env://')
+    #torch.cuda.set_device(opt.local_rank)
+    #torch.distributed.init_process_group(backend='nccl', init_method='env://')
     cudnn.benchmark = True
 
     # setup logger
     os.makedirs(opt.output_dir, exist_ok=True)
-    logger = setup_logger(output=opt.output_dir, distributed_rank=dist.get_rank(), name="contrast")
+    
+    logger = setup_logger(output=opt.output_dir, name="contrast")
     if dist.get_rank() == 0:
         path = os.path.join(opt.output_dir, "config.json")
         with open(path, 'w') as f:

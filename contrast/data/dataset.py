@@ -47,6 +47,7 @@ def make_dataset(dir, class_to_idx, extensions):
     return images
 
 
+
 def make_dataset_with_ann(ann_file, img_prefix, extensions, dataset='ImageNet'):
     images = []
 
@@ -294,3 +295,82 @@ class ImageFolder(DatasetFolder):
                 return img, img2, index, target
             else:
                 return img, index, target
+
+
+class CityScapesFolder(DatasetFolder):
+    """A generic data loader where the images are arranged in this way: ::
+        root/dog/xxx.png
+        root/dog/xxy.png
+        root/dog/xxz.png
+        root/cat/123.png
+        root/cat/nsdf3.png
+        root/cat/asd932_.png
+    Args:
+        root (string): Root directory path.
+        transform (callable, optional): A function/transform that  takes in an PIL image
+            and returns a transformed version. E.g, ``transforms.RandomCrop``
+        target_transform (callable, optional): A function/transform that takes in the
+            target and transforms it.
+        loader (callable, optional): A function to load an image given its path.
+     Attributes:
+        imgs (list): List of (image path, class_index) tuples
+    """
+
+    def __init__(self, root, ann_file='', img_prefix='', transform=None, target_transform=None,
+                 loader=default_img_loader, cache_mode="no", dataset='cityscapes',
+                 two_crop=False, return_coord=False):
+        super(CityScapesFolder, self).__init__(root, loader, IMG_EXTENSIONS,
+                                          ann_file=ann_file, img_prefix=img_prefix,
+                                          transform=transform, target_transform=target_transform,
+                                          cache_mode=cache_mode, dataset=dataset)
+        self.imgs = self.samples
+        self.two_crop = two_crop
+        self.return_coord = return_coord
+
+    def __getitem__(self, index):
+        """
+        Args:
+            index (int): Index
+        Returns:
+            tuple: (image, target) where target is class_index of the target class.
+        """
+        path, target = self.samples[index]
+        image = self.loader(path)
+
+        if self.transform is not None:
+            if isinstance(self.transform, tuple) and len(self.transform) == 2:
+                img = self.transform[0](image)
+            else:
+                img = self.transform(image)
+        else:
+            img = image
+
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        if self.two_crop:
+            if isinstance(self.transform, tuple) and len(self.transform) == 2:
+                img2 = self.transform[1](image)
+            else:
+                img2 = self.transform(image)
+
+        if self.return_coord:
+            assert isinstance(img, tuple)
+            img, coord = img
+
+            if self.two_crop:
+                img2, coord2 = img2
+                return img, img2, coord, coord2, index, target
+            else:
+                return img, coord, index, target
+        else:
+            if isinstance(img, tuple):
+                img, coord = img
+
+            if self.two_crop:
+                if isinstance(img2, tuple):
+                    img2, coord2 = img2
+                return img, img2, index, target
+            else:
+                return img, index, target
+
