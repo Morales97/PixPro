@@ -4,10 +4,10 @@ import time
 from shutil import copyfile
 
 import torch
-import torch.distributed as dist
+#import torch.distributed as dist
 from torch.backends import cudnn
-from torch.nn.parallel import DistributedDataParallel
-from torch.utils.data.distributed import DistributedSampler
+#from torch.nn.parallel import DistributedDataParallel
+#from torch.utils.data.distributed import DistributedSampler
 from torch.utils.tensorboard import SummaryWriter
 
 from contrast import models
@@ -33,23 +33,23 @@ def build_model(args):
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(
             model.parameters(),
-            lr=args.batch_size * dist.get_world_size() / 256 * args.base_learning_rate,
+            lr= args.base_learning_rate, # args.batch_size * dist.get_world_size() / 256 * args.base_learning_rate,
             momentum=args.momentum,
             weight_decay=args.weight_decay,)
     elif args.optimizer == 'lars':
         params = add_weight_decay(model, args.weight_decay)
         optimizer = torch.optim.SGD(
             params,
-            lr=args.batch_size * dist.get_world_size() / 256 * args.base_learning_rate,
+            lr=args.base_learning_rate, # args.batch_size * dist.get_world_size() / 256 * args.base_learning_rate,
             momentum=args.momentum,)
         optimizer = LARS(optimizer)
     else:
         raise NotImplementedError
 
-    if args.amp_opt_level != "O0":
-        model, optimizer = amp.initialize(model, optimizer, opt_level=args.amp_opt_level)
+    #if args.amp_opt_level != "O0":
+    #    model, optimizer = amp.initialize(model, optimizer, opt_level=args.amp_opt_level)
 
-    model = DistributedDataParallel(model, device_ids=[args.local_rank], broadcast_buffers=False)
+    #model = DistributedDataParallel(model, device_ids=[args.local_rank], broadcast_buffers=False)
 
     return model, optimizer
 
@@ -128,18 +128,23 @@ def main(args):
         load_checkpoint(args, model, optimizer, scheduler, sampler=train_loader.sampler)
 
     # tensorboard
+    '''
     if dist.get_rank() == 0:
         summary_writer = SummaryWriter(log_dir=args.output_dir)
     else:
         summary_writer = None
+    '''
+    summary_writer = None
+
 
     for epoch in range(args.start_epoch, args.epochs + 1):
-        if isinstance(train_loader.sampler, DistributedSampler):
-            train_loader.sampler.set_epoch(epoch)
+        #if isinstance(train_loader.sampler, DistributedSampler):
+        #    train_loader.sampler.set_epoch(epoch)
 
         train(epoch, train_loader, model, optimizer, scheduler, args, summary_writer)
 
-        if dist.get_rank() == 0 and (epoch % args.save_freq == 0 or epoch == args.epochs):
+        #if dist.get_rank() == 0 and (epoch % args.save_freq == 0 or epoch == args.epochs):
+        if (epoch % args.save_freq == 0 or epoch == args.epochs):
             save_checkpoint(args, epoch, model, optimizer, scheduler, sampler=train_loader.sampler)
 
 
@@ -204,7 +209,7 @@ if __name__ == '__main__':
     os.makedirs(opt.output_dir, exist_ok=True)
     
     logger = setup_logger(output=opt.output_dir, name="contrast")
-    if dist.get_rank() == 0:
+    if True: #dist.get_rank() == 0:
         path = os.path.join(opt.output_dir, "config.json")
         with open(path, 'w') as f:
             json.dump(vars(opt), f, indent=2)
