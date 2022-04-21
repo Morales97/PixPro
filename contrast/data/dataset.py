@@ -6,7 +6,7 @@ import time
 import torch.distributed as dist
 import torch.utils.data as data
 from PIL import Image
-from pycocotools.coco import COCO
+#from pycocotools.coco import COCO
 
 from .zipreader import is_zip_path, ZipReader
 
@@ -52,6 +52,7 @@ def make_dataset_with_ann(ann_file, img_prefix, extensions, dataset='ImageNet'):
     images = []
 
     # make COCO dataset
+    '''
     if dataset == 'COCO':
         coco = COCO(ann_file)
         img_ids = coco.getImgIds()
@@ -65,6 +66,7 @@ def make_dataset_with_ann(ann_file, img_prefix, extensions, dataset='ImageNet'):
             images.append(item)
 
         return images
+    '''
 
     # make ImageNet or VOC dataset
     with open(ann_file, "r") as f:
