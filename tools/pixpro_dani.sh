@@ -11,7 +11,7 @@ CUDA_VISIBLE_DEVICES=0 python \
     --data-dir ${data_dir} \
     --output-dir ${output_dir} \
     \
-    --zip --cache-mode no \
+    --cache-mode no \
     --crop 0.08 \
     --aug BYOL \
     --dataset ImageNet \
