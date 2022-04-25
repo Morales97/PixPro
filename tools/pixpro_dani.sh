@@ -3,7 +3,7 @@
 set -e
 set -x
 
-data_dir="../../ssda/data/cityscapes/leftImg8bit_tiny"
+data_dir="/home/danmoral/ssda/data/cityscapes/leftImg8bit_tiny"
 output_dir="./output/pixpro_dani"
 
 CUDA_VISIBLE_DEVICES=0 python \
