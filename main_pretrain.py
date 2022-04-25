@@ -2,7 +2,7 @@ import json
 import os
 import time
 from shutil import copyfile
-
+import pdb
 import torch
 #import torch.distributed as dist
 from torch.backends import cudnn
@@ -159,6 +159,7 @@ def train(epoch, train_loader, model, optimizer, scheduler, args, summary_writer
 
     end = time.time()
     for idx, data in enumerate(train_loader):
+        pdb.set_trace()
         data = [item.cuda(non_blocking=True) for item in data]
 
         # In PixPro, data[0] -> im1, data[1] -> im2, data[2] -> coord1, data[3] -> coord2
