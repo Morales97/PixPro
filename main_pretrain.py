@@ -180,7 +180,7 @@ def train(epoch, train_loader, model, optimizer, scheduler, args, summary_writer
         end = time.time()
 
         train_len = len(train_loader)
-        if idx % args.print_freq == 0:
+        if True or idx % args.print_freq == 0:
             lr = optimizer.param_groups[0]['lr']
             logger.info(
                 f'Train: [{epoch}/{args.epochs}][{idx}/{train_len}]  '
@@ -221,3 +221,4 @@ if __name__ == '__main__':
     )
 
     main(opt)
+
