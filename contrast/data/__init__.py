@@ -45,12 +45,16 @@ def get_loader(aug_type, args, two_crop=False, prefix='train', return_coord=Fals
         '''
 
     # sampler
+    indices = np.arange(len(train_dataset))
+    sampler = SubsetRandomSampler(indices)
+    '''
     indices = np.arange(dist.get_rank(), len(train_dataset), dist.get_world_size())
     if args.zip and args.cache_mode == 'part':
         sampler = SubsetRandomSampler(indices)
     else:
         sampler = DistributedSampler(train_dataset)
-
+    '''
+    
     # dataloader
     return DataLoader(
         train_dataset,
