@@ -158,8 +158,8 @@ def train(epoch, train_loader, model, optimizer, scheduler, args, summary_writer
     loss_meter = AverageMeter()
 
     end = time.time()
+    pdb.set_trace()
     for idx, data in enumerate(train_loader):
-        pdb.set_trace()
         data = [item.cuda(non_blocking=True) for item in data]
 
         # In PixPro, data[0] -> im1, data[1] -> im2, data[2] -> coord1, data[3] -> coord2
